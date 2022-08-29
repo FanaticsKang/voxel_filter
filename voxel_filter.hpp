@@ -2,6 +2,7 @@
 #include <iostream>
 #include "voxel_filter.h"
 
+namespace Alpha {
 template <typename PointT>
 void VoxelFilter<PointT>::getMinMax3D(const pcl::PointCloud<PointT> &cloud,
                                       const std::vector<int> &indices,
@@ -92,7 +93,6 @@ void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
   // First pass: go over all points and insert them into the index_vector
   // vector with calculated idx. Points with the same idx value will
   // contribute to the same point of resulting CloudPoint
-  std::cout << "indices: " << indices_.size() << std::endl;
   for (std::vector<int>::const_iterator it = indices_.begin();
        it != indices_.end(); ++it) {
     if (!input_->is_dense) {
@@ -137,7 +137,6 @@ void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
       first_and_last_indices_vector;
   // Worst case size
   first_and_last_indices_vector.reserve(index_vector.size());
-  std::cout << "index size: " << index_vector.size() << std::endl;
   while (index < index_vector.size()) {
     unsigned int i = index + 1;
     while (i < index_vector.size() &&
@@ -152,8 +151,7 @@ void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
   }
 
   // Fourth pass: compute centroids, insert them into their final position
-  output.points.resize(total);
-  std::cout << "total: " << total << std::endl;
+  output.points.reserve(total);
 
   index = 0;
   for (unsigned int cp = 0; cp < first_and_last_indices_vector.size(); ++cp) {
@@ -170,9 +168,12 @@ void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
           input_->points[index_vector[li].cloud_point_index].getVector4fMap();
 
     centroid /= static_cast<float>(last_index - first_index);
-    output.points[index].getVector4fMap() = centroid;
+    PointT pt = input_->points[index_vector[first_index].cloud_point_index];
+    pt.getVector4fMap() = centroid;
+    output.points.emplace_back(pt);
 
     ++index;
   }
   output.width = static_cast<uint32_t>(output.points.size());
 }
+}  // namespace Alpha

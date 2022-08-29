@@ -2,6 +2,7 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+namespace Alpha {
 
 struct cloud_point_index_idx {
   unsigned int idx;
@@ -55,3 +56,5 @@ class VoxelFilter {
 
   int min_points_per_voxel_ = 0;
 };
+
+}  // namespace Alpha
