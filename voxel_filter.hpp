@@ -1,10 +1,11 @@
+#pragma once
+
 #include <float.h>
 #include <iostream>
 #include "voxel_filter.h"
 
-namespace Alpha {
 template <typename PointT>
-void VoxelFilter<PointT>::getMinMax3D(const pcl::PointCloud<PointT> &cloud,
+void VoxelFilter<PointT>::GetMinMax3D(const pcl::PointCloud<PointT> &cloud,
                                       const std::vector<int> &indices,
                                       Eigen::Vector4f &min_pt,
                                       Eigen::Vector4f &max_pt) {
@@ -38,9 +39,9 @@ void VoxelFilter<PointT>::getMinMax3D(const pcl::PointCloud<PointT> &cloud,
 }
 
 template <typename PointT>
-void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
+void VoxelFilter<PointT>::ApplyFilter(pcl::PointCloud<PointT> &output) {
   // Has the input dataset been set already?
-  if (!input_) {
+  if (input_ == nullptr) {
     std::cout << "No input dataset given" << std::endl;
     output.width = output.height = 0;
     output.points.clear();
@@ -54,7 +55,7 @@ void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
 
   Eigen::Vector4f min_p, max_p;
 
-  getMinMax3D(*input_, indices_, min_p, max_p);
+  GetMinMax3D(*input_, indices_, min_p, max_p);
 
   // Check that the leaf size is not too small, given the size of the data
   int64_t dx =
@@ -87,7 +88,7 @@ void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
   divb_mul_ = Eigen::Vector4i(1, div_b_[0], div_b_[0] * div_b_[1], 0);
 
   // Storage for mapping leaf and pointcloud indexes
-  std::vector<cloud_point_index_idx> index_vector;
+  std::vector<CloudPointIndexIdx> index_vector;
   index_vector.reserve(indices_.size());
 
   // First pass: go over all points and insert them into the index_vector
@@ -116,15 +117,15 @@ void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
 
     // Compute the centroid leaf index
     int idx = ijk0 * divb_mul_[0] + ijk1 * divb_mul_[1] + ijk2 * divb_mul_[2];
-    index_vector.push_back(
-        cloud_point_index_idx(static_cast<unsigned int>(idx), *it));
+    index_vector.emplace_back(
+        CloudPointIndexIdx(static_cast<unsigned int>(idx), *it));
   }
 
   // Second pass: sort the index_vector vector using value representing target
   // cell as index in effect all points belonging to the same output cell will
   // be next to each other
   std::sort(index_vector.begin(), index_vector.end(),
-            std::less<cloud_point_index_idx>());
+            std::less<CloudPointIndexIdx>());
 
   // Third pass: count output cells
   // we need to skip all the same, adjacenent idx values
@@ -163,11 +164,14 @@ void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
     // Limit downsampling to coords
     Eigen::Vector4f centroid(Eigen::Vector4f::Zero());
 
-    for (unsigned int li = first_index; li < last_index; ++li)
+    for (unsigned int li = first_index; li < last_index; ++li) {
       centroid +=
           input_->points[index_vector[li].cloud_point_index].getVector4fMap();
+    }
 
     centroid /= static_cast<float>(last_index - first_index);
+
+    // KEY! 这里新建一个点，赋值first_index的所有属性
     PointT pt = input_->points[index_vector[first_index].cloud_point_index];
     pt.getVector4fMap() = centroid;
     output.points.emplace_back(pt);
@@ -176,4 +180,3 @@ void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
   }
   output.width = static_cast<uint32_t>(output.points.size());
 }
-}  // namespace Alpha

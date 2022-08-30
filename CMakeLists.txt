@@ -16,7 +16,7 @@ FATAL: In-source builds are not allowed.
 endif()
 
 #set( CMAKE_BUILD_TYPE "Debug" )
-set( CMAKE_CXX_FLAGS "-std=c++11 -O3" )
+set( CMAKE_CXX_FLAGS "-std=c++11 -O3 -Wall -Werror" )
 
 # # OpenMP
 # FIND_PACKAGE( OpenMP QUIET)
@@ -62,9 +62,8 @@ add_definitions(${PCL_DEFINITIONS})
 
 
 add_executable(voxel_filter main.cc)
-
 target_link_libraries( voxel_filter ${PCL_LIBRARIES} )
-#target_link_libraries( xxx ${XXX_LIBRARIES} )
-#Link Opencv
-#target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+
+add_executable(kd_tree kd_tree2.cc)
+target_link_libraries(kd_tree  ${PCL_LIBRARIES} )
 

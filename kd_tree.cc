@@ -1,5 +1,6 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/impl/voxel_grid.hpp>
+#include <pcl/kdtree/kdtree_flann.h>
 
 #include "semantic_point.h"
 #include "toc.h"
@@ -29,29 +30,7 @@ int main(int argc, char** argv) {
       tmp.type = 5;
     }
   }
+  pcl::KdTreeFLANN<pcl::SemanticPoint> kdtree;
+  kdtree.setInputCloud(cloud_in);
 
-  VoxelFilter<pcl::SemanticPoint> filter(cloud_in);
-  filter.SetLeafSize(0.1);
-  Alpha::TicToc tic;
-  filter.ApplyFilter(*cloud_filtered);
-  std::cout << "time cost: " << tic.TocMicroseconds() << std::endl;
-
-  pcl::VoxelGrid<pcl::SemanticPoint> filter2;
-  filter2.setInputCloud(cloud_in);
-  filter2.setLeafSize(0.1, 0.1, 0.1);
-
-  tic.Tic();
-  filter2.filter(*cloud_filtered_2);
-  std::cout << "icp time cost: " << tic.TocMicroseconds() << std::endl;
-
-  int index_type = 0;
-  for (auto& tmp : cloud_filtered->points) {
-    if (tmp.type == 5) {
-      ++index_type;
-    }
-  }
-
-  std::cout << "filter(origin / ours / pcl): " << cloud_in->size() << " / "
-            << cloud_filtered->size() << " / " << cloud_filtered_2->size()
-            << ", line points: " << index << " / " << index_type << std::endl;
 }
