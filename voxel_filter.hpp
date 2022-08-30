@@ -4,7 +4,7 @@
 
 namespace Alpha {
 template <typename PointT>
-void VoxelFilter<PointT>::getMinMax3D(const pcl::PointCloud<PointT> &cloud,
+void VoxelFilter<PointT>::GetMinMax3D(const pcl::PointCloud<PointT> &cloud,
                                       const std::vector<int> &indices,
                                       Eigen::Vector4f &min_pt,
                                       Eigen::Vector4f &max_pt) {
@@ -38,7 +38,7 @@ void VoxelFilter<PointT>::getMinMax3D(const pcl::PointCloud<PointT> &cloud,
 }
 
 template <typename PointT>
-void VoxelFilter<PointT>::applyFilter(pcl::PointCloud<PointT> &output) {
+void VoxelFilter<PointT>::ApplyFilter(pcl::PointCloud<PointT> &output) {
   // Has the input dataset been set already?
   if (!input_) {
     std::cout << "No input dataset given" << std::endl;

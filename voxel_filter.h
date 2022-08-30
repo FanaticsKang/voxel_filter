@@ -24,8 +24,11 @@ class VoxelFilter {
     }
   };
 
-  void applyFilter(pcl::PointCloud<PointT> &output);
-  inline void setLeafSize(float lx, float ly, float lz) {
+  void ApplyFilter(pcl::PointCloud<PointT> &output);
+
+  inline void SetLeafSize(const float ls) { SetLeafSize(ls, ls, ls); }
+
+  inline void SetLeafSize(const float lx, const float ly, const float lz) {
     leaf_size_[0] = lx;
     leaf_size_[1] = ly;
     leaf_size_[2] = lz;
@@ -38,7 +41,7 @@ class VoxelFilter {
   }
 
  private:
-  void getMinMax3D(const pcl::PointCloud<PointT> &cloud,
+  void GetMinMax3D(const pcl::PointCloud<PointT> &cloud,
                    const std::vector<int> &indices, Eigen::Vector4f &min_pt,
                    Eigen::Vector4f &max_pt);
 
@@ -54,7 +57,7 @@ class VoxelFilter {
 
   Eigen::Vector4i min_b_, max_b_, div_b_, divb_mul_;
 
-  int min_points_per_voxel_ = 0;
+  unsigned int min_points_per_voxel_ = 0;
 };
 
 }  // namespace Alpha

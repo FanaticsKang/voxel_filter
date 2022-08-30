@@ -31,9 +31,9 @@ int main(int argc, char** argv) {
   }
 
   Alpha::VoxelFilter<pcl::SemanticPoint> filter(cloud_in);
-  filter.setLeafSize(0.1, 0.1, 0.1);
+  filter.SetLeafSize(0.1);
   Alpha::TicToc tic;
-  filter.applyFilter(*cloud_filtered);
+  filter.ApplyFilter(*cloud_filtered);
   std::cout << "time cost: " << tic.TocMicroseconds() << std::endl;
 
   pcl::VoxelGrid<pcl::SemanticPoint> filter2;
